@@ -1,0 +1,216 @@
+import turtle
+import random
+import pygame
+import time
+
+pygame.mixer.init()
+pygame.mixer.music.load("mario.mp3")
+pygame.mixer.music.play()
+
+s = turtle.Screen()
+s.setup(width=650, height=650)
+s.bgcolor("forestgreen")
+s.title("Apple Catcher")
+s.bgpic("blue bgcolor.gif")
+
+player_turtle = turtle.Turtle()
+player_turtle.color("dark blue")
+player_turtle.shape("triangle")
+
+pen = turtle.Turtle()
+pen.speed(0)
+pen.pensize(10)
+pen.penup()
+pen.goto(300, -300)
+pen.pendown()
+for vinayak in range(4):
+    pen.bk(600)
+    pen.rt(90)
+pen.hideturtle()
+pen.penup()
+pen.goto(-190, 240)
+pen.pendown()
+pen.write("APPLE CATCHERS", font=("Italic", 30))
+
+apple = turtle.Turtle()
+apple.speed(0)
+apple.shape("circle")
+apple.color("red")
+apple.penup()
+apple.setx(random.randint(-250, 250))
+apple.sety(random.randint(-250, 250))
+apple.seth(random.randint(0, 360))
+
+god_apple = turtle.Turtle()
+god_apple.speed(0)
+god_apple.shape("circle")
+god_apple.color("gold")
+god_apple.penup()
+god_apple.sety(random.randint(-250, 250))
+god_apple.seth(random.randint(0, 360))
+
+
+points = 0
+point_counter = turtle.Turtle()
+point_counter.hideturtle()
+point_counter.penup()
+point_counter.setx(-280)
+point_counter.sety(260)
+point_counter.write("Points: 0", font=("Arial", 16, "normal"))
+
+spike = turtle.Turtle()
+spike.speed(0)
+spike.color("black", "white")
+spike.shape("triangle")
+spike.penup()
+spike.setx(random.randint(-250, 250))
+spike.sety(random.randint(-250, 250))
+
+
+BOMB = turtle.Turtle()
+BOMB.shape("circle")
+BOMB.color("black")
+BOMB.penup()
+BOMB.setx(random.randint(-250, 250))
+BOMB.sety(random.randint(-250, 250))
+BOMB.seth(random.randint(0, 360))
+BOMB.shapesize(2.5)
+
+extra_guy = turtle.Turtle()
+extra_guy.hideturtle()
+
+
+def move_left():
+    player_turtle.left(15)
+
+
+def move_right():
+    player_turtle.right(15)
+
+
+def move_random():
+    player_turtle.penup()
+    player_turtle.home()
+    player_turtle.setx(random.randint(-300, 300))
+    player_turtle.sety(random.randint(-300, 300))
+    player_turtle.pendown()
+
+
+def increase_speed():
+    global speed
+    speed += 0.25
+
+
+def decrease_speed():
+    global speed
+    speed -= 0.25
+
+
+def check_collision():
+    global points
+    if player_turtle.distance(apple) < 20:
+        points += 1
+        point_counter.clear()
+        point_counter.write(
+            "Points: " + str(points), align="left", font=("Arial", 16, "normal")
+        )
+        apple.setx(random.randint(-250, 250))
+        apple.sety(random.randint(-250, 250))
+    elif player_turtle.distance(god_apple) < 20:
+        point_counter.clear()
+        points += 5
+        point_counter.write("Points: " + str(points), align="left", font=("Arial", 16, "normal"))
+        god_apple.setx(random.randint(-250, 250))
+        god_apple.sety(random.randint(-250, 250))
+
+
+def GAMEOVER():
+    if player_turtle.distance(spike) < 16 or player_turtle.distance(BOMB) < 30:
+        pygame.mixer.music.stop()
+        extra_guy.clear()
+        apple.penup()
+        apple.goto(-240, 100)
+        apple.pendown()
+        apple.write("UH OH😔", 0, font=("Italic", 50, "normal"))
+        apple.clear()
+        pen.clear()
+        time.sleep(1.2)
+        player_turtle.clear()
+        player_turtle.hideturtle()
+        pen.hideturtle()
+        god_apple.hideturtle()
+        spike.hideturtle()
+        BOMB.hideturtle()
+        apple.hideturtle()
+        point_counter.hideturtle()
+        point_counter.clear()
+        s.bgpic("GAMEOVER.gif")
+        apple.ht()
+
+
+def you_win():
+    if points >= 30:
+        pen.penup()
+        extra_guy.clear()
+        point_counter.clear()
+        pen.color("dark blue")
+        pen.goto(-230, 150)
+        pen.write("WOOHOO😁😁", font=("Italic", 50))
+        pen.clear()
+        time.sleep(1.2)
+        player_turtle.clear()
+        player_turtle.hideturtle()
+        god_apple.hideturtle()
+        spike.hideturtle()
+        BOMB.hideturtle()
+        apple.hideturtle()
+        point_counter.hideturtle()
+        s.bgcolor("dark blue")
+        extra_guy.penup()
+        extra_guy.color("black")
+        extra_guy.goto(-240, 80)
+        extra_guy.pendown()
+        extra_guy.write("YOU WIN😁😁😁", font=("Italic", 50))
+
+
+speed = 0.5
+s.listen()
+s.onkeypress(move_right, "Right")
+s.onkeypress(move_left, "Left")
+s.onkeypress(move_random, "r")
+s.onkeypress(increase_speed, "Up")
+s.onkeypress(decrease_speed, "Down")
+
+s.tracer(10)
+
+while True:
+    s.update()
+    player_turtle.penup()
+    if player_turtle.distance(spike) < 16 or player_turtle.distance(BOMB) < 30:
+        GAMEOVER()
+        break
+    player_turtle.fd(speed)
+    apple.fd(0.25)
+    god_apple.fd(0.5)
+
+    if player_turtle.ycor() > 290 or player_turtle.ycor() < -290:
+        player_turtle.rt(180)
+    if player_turtle.xcor() > 290 or player_turtle.xcor() < -290:
+        player_turtle.rt(180)
+
+    if apple.ycor() > 290 or apple.ycor() < -290:
+        apple.rt(180)
+    if apple.xcor() > 290 or apple.xcor() < -290:
+        apple.rt(180)
+
+    if god_apple.ycor() > 290 or god_apple.ycor() < -290:
+        god_apple.rt(180)
+    if god_apple.xcor() > 290 or god_apple.xcor() < -290:
+        god_apple.rt(180)
+
+    you_win()
+    check_collision()
+    you_win()
+
+pygame.quit()
+turtle.done()
